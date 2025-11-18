@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pybo-mysql
+  namespace: mysite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pybo-mysql
+  template:
+    metadata:
+      labels:
+        app: pybo-mysql
+    spec:
+      securityContext:
+        fsGroup: 0
+      nodeSelector:
+        role: db
+      containers:
+        - name: mysql
+          image: quay.io/sclorg/mysql-80-c9s
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+            - name: MYSQL_LOWER_CASE_TABLE_NAMES
+              value: "1"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql/data
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pybo-mysql
+  namespace: mysite
+spec:
+  selector:
+    app: pybo-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  clusterIP: None
