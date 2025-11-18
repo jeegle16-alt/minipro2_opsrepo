@@ -4,7 +4,7 @@ metadata:
   name: pybo-web
   namespace: mysite
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: pybo-web
