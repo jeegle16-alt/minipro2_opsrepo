@@ -17,7 +17,7 @@ spec:
         role: web
       containers:
         - name: django
-          image: jeegle16/django-pybo:v3
+          image: jeegle16/django-pybo:v4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
